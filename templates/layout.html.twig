@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello {{ controller_name }}!{% endblock %}
+
+ {% block stylesheets %}{% endblock %}
+
+{% block body %}
+    {% include 'navbar.html.twig' %}
+    <div class="container">
+        {% block layout %}
+        {% endblock %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}{% endblock %}

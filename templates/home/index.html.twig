@@ -1,0 +1,11 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{% endblock %}
+
+{% block layout %}
+    <div class="jumbotron">
+        {% if user.uid is defined %}
+        <h1 class="text-center">{{ user.uid }}</h1>
+        {% endif %}
+    </div>
+{% endblock %}

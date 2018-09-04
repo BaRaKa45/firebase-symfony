@@ -1,0 +1,19 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Hello {{ controller_name }}!{% endblock %}
+
+ {% block stylesheets %}
+     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.css"/>
+ {% endblock %}
+{% block layout %}
+    <div class="jumbotron">
+        <div id="firebaseui-auth-container">
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.1.1/firebaseui.js"></script>
+    <script src="{{ asset('build/firebase.js') }}"></script>
+{% endblock %}
