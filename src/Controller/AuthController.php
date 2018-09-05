@@ -3,13 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Repository\UserRepository;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class AuthController extends AbstractController
 {
@@ -45,10 +45,15 @@ class AuthController extends AbstractController
                 $entityManager = $this->getDoctrine()->getManager();
                 $entityManager->persist($user);
                 $entityManager->flush();
+                //-------------------------------------
 
-                $authToken = $authenticationManager->authenticate($token);
-                $tokenStorage->setToken($authToken);
 
+
+                $token_ = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
+                $this->container->get('security.token_storage')->setToken(($token_));
+                $this->get('session')->set('main', serialize($token_));
+
+                //------------------------------------------
                 return $this->render('home/index.html.twig', [
                     'user' => $user,
                 ]);

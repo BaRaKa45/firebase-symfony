@@ -7,21 +7,20 @@ security:
         our_db_provider:
             entity:
                 class: App\Entity\User
+                #property: username
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: ~
-            pattern:    ^/
-            http_basic: ~
-            user_checker: App\Security\UserChecker
+            anonymous: true
+            #user_checker: App\Security\UserChecker
             provider: our_db_provider
             # https://symfony.com/doc/current/security/form_login_setup.html
             form_login:
-                login_path: connexion
-                check_path: connexion
-                csrf_token_generator: security.csrf.token_manager
+                login_path: auth
+                check_path: auth
+                #csrf_token_generator: security.csrf.token_manager
             logout:
                 path: /deconnexion
                 target: /

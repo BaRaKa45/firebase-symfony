@@ -85,22 +85,3 @@ function redirect_post(link, post_var) {
     });
     $('<form class="hidden" action="'+link+'" method="POST">'+form+'</form>').appendTo('body').submit();
 }
-
-
-/*
-firebase.auth().onAuthStateChanged(user=>{
-    if(user){
-        console.log("Connecté");
-        var user = firebase.auth().currentUser;
-
-        firebase.auth().currentUser.getIdToken(/!* forceRefresh *!/ true).then(function (idToken) {
-
-            redirect_post('register', {token: idToken});
-
-        }).catch(function (error) {
-            console.log(error.message);
-        });
-    } else{
-        console.log("Déconnecté");
-    }
-});*/
