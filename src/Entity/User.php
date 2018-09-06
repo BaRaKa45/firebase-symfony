@@ -24,11 +24,17 @@ class User implements UserInterface, \Serializable
     private $uid;
 
     /**
-     * @ORM\Column(type="string", length=25, unique=true)
+     * @ORM\Column(type="string", length=50, unique=true)
      * @Assert\NotBlank()
-     * @Assert\Length(max=25)
+     * @Assert\Length(max=50)
      */
     private $username;
+
+    /**
+     * @ORM\Column(type="string", length=120, nullable=true)
+     * @Assert\Length(max=120)
+     */
+    private $name;
 
     /**
      * @ORM\Column(type="string", length=64)
@@ -36,9 +42,9 @@ class User implements UserInterface, \Serializable
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=60, unique=true)
+     * @ORM\Column(type="string", length=80, unique=true, nullable=true)
      * @Assert\NotBlank()
-     * @Assert\Length(max=60)
+     * @Assert\Length(max=80)
      * @Assert\Email()
      */
     private $email;
@@ -65,6 +71,11 @@ class User implements UserInterface, \Serializable
      * @var \DateTime
      */
     private $passwordRequestedAt;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $picture;
 
     /**
      * @var string
@@ -255,5 +266,25 @@ class User implements UserInterface, \Serializable
     {
         $this->token = $token;
         return $this;
+    }
+
+    public function setPicture($picture)
+    {
+        $this->picture = $picture;
+    }
+
+    public function getPicture()
+    {
+        return $this->picture;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
     }
 }

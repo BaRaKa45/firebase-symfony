@@ -3,13 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Service\UserService;
+use App\Service\Firebase;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AuthController extends AbstractController
 {
@@ -27,38 +25,68 @@ class AuthController extends AbstractController
     /**
      * @Route("/register", name="register", methods="POST")
      */
-    public function register(Request $request, UserService $userService, TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager)
+    public function register(Request $request, Firebase $firebase, UserPasswordEncoderInterface $encoder)
     {
         $token = $request->request->get('token');
 
-        if(!empty($token)) {
-            $uid = $userService->getUser($token)->uid;
+        if (!empty($token)) {
+            $firebase->setToken($token);
             $userRepository = $this->getDoctrine()->getRepository(User::class);
+            $userInDataBase = $userRepository->findOneBy(['uid' => $firebase->getUser()->uid]);
+            if ($userInDataBase == null) {
 
-            if($userRepository->findOneBy(['uid'=> $uid]) == null) {
                 $user = new User();
-                $user->setUid($uid);
-                $user->setEmail($userService->getUser($token)->email);
-                $user->setPassword('test');
+                $user->setUid($firebase->getUser()->uid);
+                $user->setEmail($firebase->getUser()->email);
+                $user->setName($firebase->getUser()->displayName);
+                $encoded = $encoder->encodePassword($user, $firebase->getUser()->uid);
+                $user->setPassword($encoded);
                 $user->setIsActive(true);
-                $user->setUsername($userService->getUser($token)->email);
+
+                if ($firebase->getUser()->email != null) {
+                    $user->setUsername($firebase->getUser()->email);
+                } else if ($firebase->getUser($token)->phoneNumber != null) {
+                    $user->setUsername($firebase->getUser()->phoneNumber);
+                }
+
+                $user->setPicture($firebase->getUser()->photoUrl);
+
+                if (count($userRepository->findAll()) == 0) {
+                    $user->setRoles(['ROLE_ADMIN']);
+                }
+
                 $entityManager = $this->getDoctrine()->getManager();
                 $entityManager->persist($user);
                 $entityManager->flush();
-                //-------------------------------------
 
+                $firebase->authUser($user);
 
-
-                $token_ = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
-                $this->container->get('security.token_storage')->setToken(($token_));
-                $this->get('session')->set('main', serialize($token_));
-
-                //------------------------------------------
-                return $this->render('home/index.html.twig', [
+                return $this->redirectToRoute('home', [
                     'user' => $user,
                 ]);
+            } else {
+                $firebase->authUser($userInDataBase);
             }
         }
         return $this->redirectToRoute('home');
+    }
+
+
+    /**
+     * @Route("disconnect", name="disconnect", methods="GET")
+     */
+    public function disconnect()
+    {
+        $this->redirectToRoute('home');
+    }
+
+    /**
+     * @Route("profil", name="profil", methods="GET")
+     */
+    public function profil()
+    {
+        return $this->render('auth/profil.html.twig', [
+            'user' => $this->getUser(),
+        ]);
     }
 }

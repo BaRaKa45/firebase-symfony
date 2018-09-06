@@ -22,7 +22,7 @@ security:
                 check_path: auth
                 #csrf_token_generator: security.csrf.token_manager
             logout:
-                path: /deconnexion
+                path: disconnect
                 target: /
             switch_user: ~
 
